@@ -11,7 +11,7 @@ class Client
 {
     public:
     std::string getName();
-    void setName();
+    void setName(std::string n);
 
     ClientState getClientState();
     void setClientState(ClientState st);

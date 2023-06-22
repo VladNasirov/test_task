@@ -7,17 +7,17 @@
 class Club
 {
     public:
-    void setNumberOfTables(int num);
+    void setNumberOfTables(unsigned int num);
     void setTime(ClubTime Start, ClubTime Stop);
-    void setCostPerHour(int cost);
+    void setCostPerHour(unsigned int cost);
 
     
 
     private:
-    int NumberOfTables;
+    unsigned int NumberOfTables;
     ClubTime start;
     ClubTime stop;
-    int CostPerHour;
+    unsigned int CostPerHour;
     std::vector<Table> tables;
     std::queue<Client> clients;
 };

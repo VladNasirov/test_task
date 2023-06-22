@@ -12,12 +12,12 @@ class Table
     public:
     void OccupyTable(Client& c);
     void FreeTable();
-
+    Table(unsigned int n);
     TableState getTableState();
     void setTableState(TableState state);
 
     private:
-    int number;
+    unsigned int number;
     TableState ts;
     Client client;
 };

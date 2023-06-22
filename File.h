@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
-#include "ClubTime.h"
+#include <fstream>
+
+#include "Event.h"
 class File
 {
     public:
@@ -11,5 +13,6 @@ class File
     Event ReadEvent();
     private:
     const std::string PATH = "test_file.txt";
+    std::streampos pos;
 };
 

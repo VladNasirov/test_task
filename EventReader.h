@@ -1,26 +1,32 @@
 #pragma once
 #include <iostream>
 #include "Club.h"
+#include "File.h"
 enum class IncomingEvent
 {
-    ClientHere,
-    ClientAtTheTable,
-    ClientWaiting,
-    ClientLeaves
+    None,
+    ClientHere=1,
+    ClientAtTheTable=2,
+    ClientWaiting=3,
+    ClientLeaves=4
 };
 enum class OutgoingEvent
 {
-    ClientLeaves,
-    ClientTookTheTable,
-    Error
+    None,
+    ClientLeaves=11,
+    ClientTookTheTable=12,
+    Error=13
 };
+
 
 class EventReader
 {
     public:
     void ReadFile();
-    bool HandleIncomingEvent(IncomingEvent incEv);
-    bool HandleOutgoingEvent(OutgoingEvent outEv);
+    void HandleEvent(Event& ev);
+    bool HandleIncomingEvent(IncomingEvent incEv, Event& ev);
+    bool HandleOutgoingEvent(OutgoingEvent outEv, Event& ev);
     private:
     Club computerClub;
+    File file;
 };

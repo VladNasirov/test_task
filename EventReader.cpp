@@ -4,13 +4,14 @@
 
 
 
-bool EventReader::HandleIncomingEvent(IncomingEvent incEv)
+bool EventReader::HandleIncomingEvent(IncomingEvent incEv, Event& ev)
 {
     switch(incEv)
     {
         case IncomingEvent::ClientHere:
         {
             //Вывод информации о клиенте
+            ev.printEvent();
             //Проверка есть ли он в клубе уже генерируется ошибка YouShallNotPass
             //Проверка прихода в нерабочие часы генерируется ошибка NotOpenYet
             //запись в очередь
@@ -38,7 +39,7 @@ bool EventReader::HandleIncomingEvent(IncomingEvent incEv)
 }
 
 
-bool EventReader::HandleOutgoingEvent(OutgoingEvent outEv)
+bool EventReader::HandleOutgoingEvent(OutgoingEvent outEv, Event& ev)
 {
       switch(outEv)
     {
@@ -58,4 +59,65 @@ bool EventReader::HandleOutgoingEvent(OutgoingEvent outEv)
         }
         
     }
+}
+
+
+void EventReader::HandleEvent(Event& ev)
+{
+    switch(ev.getEventId())
+    {
+        case 0:
+        {
+            //TODO none type enum
+            break;
+        }
+        case 1:
+        {
+            HandleIncomingEvent(IncomingEvent::ClientHere, ev);
+            break;
+        }
+        case 2:
+        {
+            HandleIncomingEvent(IncomingEvent::ClientAtTheTable, ev);
+            break;
+        }
+        case 3:
+        {
+            HandleIncomingEvent(IncomingEvent::ClientWaiting, ev);
+            break;
+        }
+        case 4:
+        {
+            HandleIncomingEvent(IncomingEvent::ClientLeaves, ev);
+            break;
+        }
+
+        case 11:
+        {
+            HandleOutgoingEvent(OutgoingEvent::ClientLeaves, ev);
+            break;
+        }
+        case 12:
+        {
+            HandleOutgoingEvent(OutgoingEvent::ClientTookTheTable, ev);
+            break;
+        }
+        case 13:
+        {
+             HandleOutgoingEvent(OutgoingEvent::Error, ev);
+            break;
+        }
+    }
+}
+void EventReader::ReadFile()
+{
+    computerClub.setNumberOfTables(file.ReadTables());
+    computerClub.setTime(file.ReadClubTimeOpen(), file.ReadClubTimeClose());
+    computerClub.setCostPerHour(file.ReadCostPerHour());
+    do
+    {
+        Event ev=file.ReadEvent();
+        HandleEvent(ev);
+        
+    }while();
 }
