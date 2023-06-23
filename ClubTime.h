@@ -6,9 +6,11 @@ class ClubTime
 {
     public:
     std::string serialize() const;
-    std::ostream& operator<<(std::ostream& os, const ClubTime& time);
+    friend std::ostream& operator<<(std::ostream& os, const ClubTime& time);
     void deserialize(const std::string& serializedTime);
-    std::istream& operator>>(std::istream& is, ClubTime& time) {
+    friend std::istream& operator>>(std::istream& is, ClubTime& time);
+    int getHours();
+    int getMinutes();
     private:
     int hours;
     int minutes;

@@ -29,3 +29,12 @@ std::istream& operator>>(std::istream& is, ClubTime& time) {
     is >> time.hours >> delimiter >> time.minutes;
     return is;
 }
+
+ int ClubTime::getHours()
+ {
+    return hours;
+ }
+int ClubTime::getMinutes()
+{
+    return minutes;
+}

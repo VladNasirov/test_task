@@ -17,7 +17,12 @@ void Event::StringToEvent(std:: string st)//TODO проверку на корр�
             exit(0);
         }
         iss.ignore();
-        iss>>body;
+        iss>>clientName;
+        if(eventId==2)
+        {
+            iss>>clientEvent;
+        }
+        
 }
 unsigned int Event::getEventId()
 {
@@ -27,4 +32,9 @@ unsigned int Event::getEventId()
 void Event::printEvent()
 {
     std::cout<<eventTime<<" "<<eventId<<" "<<body;
+}
+
+ClubTime Event::getTime()
+{
+    return eventTime;
 }

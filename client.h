@@ -3,6 +3,7 @@
 
 enum class ClientState
 {
+    None,
     Waiting,
     Playing
 };
@@ -15,6 +16,8 @@ class Client
 
     ClientState getClientState();
     void setClientState(ClientState st);
+
+    Client();
 
     private:
     std::string name;

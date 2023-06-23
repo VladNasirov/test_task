@@ -118,7 +118,7 @@ int File::ReadCostPerHour()
             }
         } else {
             std::cout << "Can`t read the line!" << std::endl;
-             exit(-1);
+            exit(-1);
         }
 
     }

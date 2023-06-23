@@ -18,3 +18,9 @@ void Client::setClientState(ClientState st)
 {
     state=st;
 }
+
+Client::Client()
+{
+    name="";
+    state=ClientState::None;
+}

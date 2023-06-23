@@ -13,27 +13,59 @@ bool EventReader::HandleIncomingEvent(IncomingEvent incEv, Event& ev)
             //Вывод информации о клиенте
             ev.printEvent();
             //Проверка есть ли он в клубе уже генерируется ошибка YouShallNotPass
+            if(computerClub.alreadyInTheClub(ev.getClientName()))
+            {
+                //YouShallNotPass
+            }
             //Проверка прихода в нерабочие часы генерируется ошибка NotOpenYet
-            //запись в очередь
+            if(!computerClub.isOpen(ev.getTime()))
+            {
+                //NotOpenYet
+            }
+
+            //Создание клиента
         }
         case IncomingEvent::ClientAtTheTable:
         {
             //Вывод информации об ивенте
+            ev.printEvent();
             //Смена стола
+
             //Занят ли стол и попытка пересесть на свой стол генерируется ошибка PlaceIsBusy.
             // Если клиент не находится в компьютерном клубе, генерируется ошибка ClientUnknown.
+            if(!computerClub.alreadyInTheClub(ev.getClientName()))
+            {
+                //ClientUnknown
+            }
         }
         case IncomingEvent::ClientWaiting:
         {
             //Вывод информации об ивенте
+            ev.printEvent();
+            
             //Если в клубе есть свободные столы, то генерируется ошибка ICanWaitNoLonger! может больше не ждать
+            if(computerClub.hasFreeTables())
+            {
+                //ICanWaitNoLonger!
+            }
             //Если очередь больше, чем число столов, то клиент уходит и генерирует OutgoingEvent::ClientLeaves
+            if(computerClub.queueTooBig())
+            {
+                HandleOutgoingEvent(OutgoingEvent::ClientLeaves, ev);
+            }
         }
         case IncomingEvent::ClientLeaves:
         {
             //Вывод информации об ивенте
+            ev.printEvent();
             //Если клиент не находится в компьютерном клубе, генерируется ошибка ClientUnknown.
+            if(!computerClub.alreadyInTheClub(ev.getClientName()))
+            {
+                //ClientUnknown
+            }
             //Когда клиент уходит, стол, за которым он сидел освобождается и его занимает первый клиент из очереди ожидания OutgoingEvent::ClientTookTheTable
+            computerClub.clientLeaves(ev.getClientName());
+            HandleOutgoingEvent(OutgoingEvent::ClientTookTheTable, ev);
         }
     }
 }
@@ -46,11 +78,13 @@ bool EventReader::HandleOutgoingEvent(OutgoingEvent outEv, Event& ev)
         case OutgoingEvent::ClientLeaves:
         {
             //Вывод информации о клиенте
+            ev.printEvent(); // не уверен, что надо
             //Генерируется в конце рабочего дня для всех клиентов, оставшихся в компьютерном клубе, в алфавитном порядке их имен. А также, когда клиент встает в очередь, а очередь ожидания уже заполнена.
         }
         case OutgoingEvent::ClientTookTheTable:
         {
             //Вывод информации об ивенте
+            ev.printEvent();// не уверен, что надо
             //Генерируется для первого клиента в очереди при освобождении любого стола.
         }
         case OutgoingEvent::Error:
