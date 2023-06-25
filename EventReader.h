@@ -2,22 +2,6 @@
 #include <iostream>
 #include "Club.h"
 #include "File.h"
-enum class IncomingEvent
-{
-    None,
-    ClientHere=1,
-    ClientAtTheTable=2,
-    ClientWaiting=3,
-    ClientLeaves=4
-};
-enum class OutgoingEvent
-{
-    None,
-    ClientLeaves=11,
-    ClientTookTheTable=12,
-    Error=13
-};
-
 
 class EventReader
 {

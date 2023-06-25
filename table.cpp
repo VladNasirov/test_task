@@ -20,3 +20,8 @@ void Table::FreeTable()
     //TODO delete client
     setTableState(TableState::Empty);
 }
+
+unsigned int Table::getTableNumber()
+{
+    return number;
+}

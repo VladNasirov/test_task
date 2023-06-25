@@ -14,6 +14,10 @@ class Table
     Table(unsigned int n);
     TableState getTableState();
     void setTableState(TableState state);
+
+    unsigned int getTableNumber();
+    
+
     private:
     unsigned int number;
     TableState ts;

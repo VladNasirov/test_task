@@ -31,10 +31,19 @@ unsigned int Event::getEventId()
 
 void Event::printEvent()
 {
-    std::cout<<eventTime<<" "<<eventId<<" "<<body;
+    std::cout<<eventTime<<" "<<eventId<<" "<<body<<std::endl;
 }
 
 ClubTime Event::getTime()
 {
     return eventTime;
+}
+unsigned int Event::getClientEvent()
+{
+    return clientEvent;
+}
+
+Event(OutgoingEvent e,ClubTime c, std::string n, unsigned int t)
+{
+    
 }
