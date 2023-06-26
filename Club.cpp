@@ -1,5 +1,7 @@
-#pragma once
 #include "Club.h"
+#include <algorithm>
+#include <sstream>
+#include <iomanip>
 void Club::setNumberOfTables(unsigned int num)
 {
     NumberOfTables=num;
@@ -10,10 +12,15 @@ void Club::setNumberOfTables(unsigned int num)
         tables.push_back(std::make_pair(tb, c));
     }
 }
-void Club::setTime(ClubTime Start, ClubTime Stop)
+void Club::setTime(std::string line)
 {
-    start=Start;
-    stop=Stop;
+    std::string startTime, stopTime;
+    std::istringstream iss(line);
+    iss>>startTime;
+    iss.ignore(1);
+    iss>>stopTime;
+    start.deserialize(startTime);
+    stop.deserialize(stopTime);
 }
 void Club::setCostPerHour(unsigned int cost)
 {
@@ -24,7 +31,10 @@ void Club::addToQue(std::shared_ptr<Client> c)
 {
     clients.push(c);
 }
-
+void Club::popFromQue()
+{
+    clients.pop();
+}
 
 bool Club::alreadyInTheClub(std::string name)//TODO просто в клубе
 {
@@ -32,15 +42,10 @@ bool Club::alreadyInTheClub(std::string name)//TODO просто в клубе
     {
         if(tables[i].second->getName()==name)
         {
-            //TODO YOUSHALL NOT PASS
             return true;
         }
     }
-    if (clients.empty()) 
-    {
-        std::cout << "Очередь пуста" << std::endl;
-    } 
-    else 
+    if (!clients.empty()) 
     {
         std::queue<std::shared_ptr <Client>> tempQueue = clients; // Создаем временную копию очереди
         while (!tempQueue.empty()) {
@@ -52,11 +57,18 @@ bool Club::alreadyInTheClub(std::string name)//TODO просто в клубе
             tempQueue.pop(); // Удаляем текущего клиента из временной очереди
         }
     }
+    for(auto client:clientsList)
+    {
+        if(client->getName()==name)
+        {
+            return true;
+        }
+    }
     return false;
 }
 
- bool Club::isOpen(ClubTime ct)
- {
+bool Club::isOpen(ClubTime ct)
+{
    if (ct.getHours() > start.getHours() && ct.getHours() < stop.getHours()) {
         // Клиент пришел внутри часов работы
         return true;
@@ -70,9 +82,9 @@ bool Club::alreadyInTheClub(std::string name)//TODO просто в клубе
         // Клиент пришел до начала работы или после окончания
         return false;
     }
- }
-  bool Club::hasFreeTables()
-  {
+}
+bool Club::hasFreeTables()
+{
     for(int i=0; i<tables.size(); i++)
     {
         if(tables[i].first->getTableState()==TableState::Empty)
@@ -81,10 +93,10 @@ bool Club::alreadyInTheClub(std::string name)//TODO просто в клубе
         }
     }
     return false;
-  }
+}
 
-  bool Club::queueTooBig()
-  {
+bool Club::queueTooBig()
+{
     if(clients.size()>NumberOfTables)
     {
         return true;
@@ -93,15 +105,15 @@ bool Club::alreadyInTheClub(std::string name)//TODO просто в клубе
     {
         return false;
     }
-  }
+}
 
-  void Club::takeTable(int tableNumber, std::shared_ptr<Client> c)
-  {
+void Club::takeTable(int tableNumber, std::shared_ptr<Client> c)//todo пересадку
+{
     for(int i=0; i<tables.size(); i++)
     {
         if(tables[i].first->getTableNumber()==tableNumber&&tables[i].first->getTableState()==TableState::Empty)
         {
-            tables[i].second->setName(c->getName());
+            tables[i].second=c;
             tables[i].second->setClientState(ClientState::Playing);
             tables[i].first->setTableState(TableState::Occupied);
             return;
@@ -112,10 +124,10 @@ bool Club::alreadyInTheClub(std::string name)//TODO просто в клубе
         }
     }
 
-  }
+}
 
-  void Club::clientLeaves(std::string name)//TODO удаление из клуба, подсчет выручки
-  {
+void Club::clientLeaves(std::string name)//TODO удаление из клуба, подсчет выручки
+{
     //Освобождение стола
    for (auto& pair : tables) {
      if (pair.second->getName() == name) {
@@ -136,27 +148,27 @@ bool Club::alreadyInTheClub(std::string name)//TODO просто в клубе
     }
 
     clients = std::move(tempQueue); // Замена исходной очереди временной очередью
-
+    deleteClientFromList(name);
    
-    }
-     void Club::updateNow(ClubTime eventTime)
-     {
+}
+void Club::updateNow(ClubTime eventTime)
+{
         Now=eventTime;
-     }
+}
 
-     ClubTime Club::getNow()
-     {
+ClubTime Club::getNow()
+{
         return Now;
-     }
+}
 
-      std::shared_ptr<Client> Club::getNextClient()
-      {
+std::shared_ptr<Client> Club::getNextClient()
+{
         std::shared_ptr<Client> client=clients.front();
         clients.pop();
         return client;
-      }
-   unsigned int Club::getFreeTable()
-   {
+}
+unsigned int Club::getFreeTable()
+{
     for(auto& pair : tables)
     {
         if(pair.first->getTableState()==TableState::Empty)
@@ -164,4 +176,118 @@ bool Club::alreadyInTheClub(std::string name)//TODO просто в клубе
             return pair.first->getTableNumber();
         }
     }
-   }
+}
+
+void Club::addToList(std::shared_ptr<Client> c)
+{
+        clientsList.push_back(c);
+}
+
+std::shared_ptr<Client> Club::getClientFromList(std::string name)
+{
+        for (const auto& client : clientsList) {
+        // Доступ к элементу внутри цикла
+        {
+            if(client->getName()==name)
+            {
+                return client;
+            }
+        }
+        }
+}
+void Club::deleteClientFromList(std::string name)
+{
+    for (const auto& client : clientsList) {
+    // Доступ к элементу внутри цикла
+    {
+        if(client->getName()==name)
+        {
+            clientsList.remove(client);
+            return;
+        }
+    }
+    }
+}
+std::shared_ptr<Client> Club::getClientByTable(std::shared_ptr<Table> t)
+{
+        for(const auto& pair: tables)
+        {
+            if(pair.first==t)
+            {
+                return pair.second;
+            }
+        }
+}
+std::shared_ptr<Table> Club::getTableByClient(std::shared_ptr<Client> c)
+{
+        for(const auto& pair: tables)
+        {
+            if(pair.second==c)
+            {
+                return pair.first;
+            }
+        }
+}
+bool compareByName(const std::pair<std::shared_ptr<Table>, std::shared_ptr<Client>> pair1, const std::pair<std::shared_ptr<Table>, std::shared_ptr<Client>> pair2) {
+        return pair1.second->getName() < pair2.second->getName();
+}
+  
+
+void Club::clearTable(std::string clientName)
+{
+        for(int i=0; i<tables.size(); i++)
+        {
+            if(tables[i].second->getName()==clientName)
+            {
+                tables[i].first->setTableState(TableState::Empty);
+                tables[i].second->setClientState(ClientState::None);
+                tables[i].second.reset();
+            }
+        }
+}
+void Club::changeTable(std::shared_ptr<Client> c, unsigned int num)//proverit
+{
+        std::shared_ptr<Table> currentTab=getTableByClient(c);
+        if(currentTab->getTableNumber()!=num)
+        {
+
+            takeTable(num, c);
+            for(auto& pair: tables)
+            {
+                if(pair.first==currentTab)
+                {
+                   pair.first->FreeTable();
+                   pair.second.reset();
+                }
+            }
+        }
+        else
+        {
+            throw("PlaceIsBusy");
+        }
+}
+
+bool Club::queIsEmpty()
+{
+    if(clients.empty())
+    {
+        return true;
+    }
+    else
+    {
+    return false;
+    }
+}
+
+void Club::printProfit()
+{
+    
+}
+void Club::printEndTime()
+{
+    std::cout<<stop<<std::endl;
+}
+void Club::printStartTime()
+{
+     std::cout<<start<<std::endl;
+}

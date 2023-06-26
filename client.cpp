@@ -1,4 +1,3 @@
-#pragma once
 #include "client.h"
 
 std::string Client::getName()
@@ -23,4 +22,9 @@ Client::Client()
 {
     name="";
     state=ClientState::None;
+}
+
+Client::Client(std::string name)
+{
+    this->name=name;
 }

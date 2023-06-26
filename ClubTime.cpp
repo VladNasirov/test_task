@@ -1,4 +1,3 @@
-#pragma once
 #include <sstream>
 #include <iomanip>
 #include "ClubTime.h"
@@ -38,3 +37,9 @@ int ClubTime::getMinutes()
 {
     return minutes;
 }
+
+ ClubTime::ClubTime(int hours, int minutes)
+ {
+   this->hours=hours;
+   this->minutes=minutes;
+ }

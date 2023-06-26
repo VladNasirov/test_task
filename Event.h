@@ -27,6 +27,8 @@ class Event
     void printEvent();
     void parseBody();
     Event(OutgoingEvent e,ClubTime c, std::string n, unsigned int t);
+    Event(OutgoingEvent e,ClubTime c, std::string n);
+    Event()=default;
     std::string getClientName();
     ClubTime getTime();
     unsigned int getClientEvent();

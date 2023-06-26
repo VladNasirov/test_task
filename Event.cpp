@@ -31,7 +31,7 @@ unsigned int Event::getEventId()
 
 void Event::printEvent()
 {
-    std::cout<<eventTime<<" "<<eventId<<" "<<body<<std::endl;
+    std::cout<<eventTime<<" "<<eventId<<" "<<clientName<<std::endl;
 }
 
 ClubTime Event::getTime()
@@ -42,8 +42,21 @@ unsigned int Event::getClientEvent()
 {
     return clientEvent;
 }
-
-Event(OutgoingEvent e,ClubTime c, std::string n, unsigned int t)
+std::string Event::getClientName()
 {
-    
+    return clientName;
 }
+
+Event::Event(OutgoingEvent e,ClubTime c, std::string n, unsigned int t)
+{
+    eventId=(unsigned int)e;//static cast
+    eventTime=c;
+    clientName=n;
+    clientEvent=t;
+}
+ Event::Event(OutgoingEvent e,ClubTime c, std::string n)
+ {
+     eventId=(unsigned int)e;
+     eventTime=c;
+     body=n;
+ }

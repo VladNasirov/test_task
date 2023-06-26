@@ -18,7 +18,7 @@ class Client
     void setClientState(ClientState st);
 
     Client();
-
+    Client(std::string name);
     private:
     std::string name;
     ClientState state;

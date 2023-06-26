@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include "client.h"
+#include "ClubTime.h"
 enum class TableState
 {
     Empty,
@@ -21,4 +22,5 @@ class Table
     private:
     unsigned int number;
     TableState ts;
+    ClubTime TableUsageTime;
 };

@@ -31,31 +31,24 @@ int File::ReadTables()
         exit(0);
     }
 }
-ClubTime File::ReadClubTimeOpen()
+std::string File::ReadClubTimeString()
 {
     std::ifstream inputFile(PATH);
     std::string line;
-    ClubTime ct;
+    inputFile.seekg(pos);
     if(inputFile.is_open())
     {
-        inputFile.seekg(pos);
-         // Считываем строку до первого пробела
-        if (std::getline(inputFile, line, ' ')) {
-            try {
-             pos = inputFile.tellg();//save pos
-             ct.deserialize(line);
-             return ct;
+    if (std::getline(inputFile, line)) {
+        try {
+            pos = inputFile.tellg();//save pos
+            return line;
             } 
             catch (const std::exception&) 
             {
                 std::cout<<"The "<<line<<" has invalid format!"<<std::endl;
                 exit(-1);
             }
-        } else {
-            std::cout<<"The "<<line<<" has invalid format!"<<std::endl;
-            exit(-1);
         }
-
     }
     else
     {
@@ -63,40 +56,7 @@ ClubTime File::ReadClubTimeOpen()
         exit(0);
     }
 }
-ClubTime File::ReadClubTimeClose()
-{
-    std::ifstream inputFile(PATH);
-    std::string line;
-    ClubTime ct;
-    if(inputFile.is_open())
-    {
-        inputFile.seekg(pos);
-         // Считываем одну строку из файла
-         
-         // Считываем строку до первого пробела
-        if (std::getline(inputFile, line, ' ')) {
-            try {
-             pos = inputFile.tellg();//save pos
-             ct.deserialize(line);
-             return ct;
-            } 
-            catch (const std::exception&) 
-            {
-                std::cout<<"The "<<line<<" has invalid format!"<<std::endl;
-                exit(-1);
-            }
-        } else {
-            std::cout<<"The "<<line<<" has invalid format!"<<std::endl;
-            exit(-1);
-        }
 
-    }
-    else
-    {
-        std::cout<<"Can`t open file!!"<<std::endl;
-        exit(0);
-    }
-}
 int File::ReadCostPerHour()
 {
     std::ifstream inputFile(PATH);
@@ -160,3 +120,26 @@ Event File::ReadEvent()
         exit(0);
     }
 }
+
+ bool File::endFile()
+ {
+    std::ifstream inputFile(PATH);
+    if(inputFile.is_open())
+    {
+        inputFile.seekg(pos);
+        if(inputFile.eof())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+    else
+    {
+        std::cout<<"Can`t open file!!"<<std::endl;
+        exit(0);
+    }
+ }

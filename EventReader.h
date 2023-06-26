@@ -8,8 +8,8 @@ class EventReader
     public:
     void ReadFile();
     void HandleEvent(Event& ev);
-    bool HandleIncomingEvent(IncomingEvent incEv, Event& ev);
-    bool HandleOutgoingEvent(OutgoingEvent outEv, Event& ev);
+    void HandleIncomingEvent(IncomingEvent incEv, Event& ev);
+    void HandleOutgoingEvent(OutgoingEvent outEv, Event& ev, const char* ErrorText);
     private:
     Club computerClub;
     File file;

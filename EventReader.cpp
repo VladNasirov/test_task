@@ -1,10 +1,6 @@
-#pragma once
 #include "EventReader.h"
 
-
-
-
-bool EventReader::HandleIncomingEvent(IncomingEvent incEv, Event& ev)
+void EventReader::HandleIncomingEvent(IncomingEvent incEv, Event& ev)
 {
     try
     {
@@ -25,22 +21,35 @@ bool EventReader::HandleIncomingEvent(IncomingEvent incEv, Event& ev)
                     throw("NotOpenYet");//NotOpenYet
                 }
                 //Создание клиента
-                
+                std::shared_ptr<Client> c=std::make_shared<Client>(ev.getClientName());
+                computerClub.addToList(c);
+                if(!computerClub.hasFreeTables())
+                {
+                    computerClub.addToQue(c);
+                }
+                break;
             }
             case IncomingEvent::ClientAtTheTable:
             {
                 //Вывод информации об ивенте
                 ev.printEvent();
-                //Смена стола
-                
-                
                 // Если клиент не находится в компьютерном клубе, генерируется ошибка ClientUnknown.
                 if(!computerClub.alreadyInTheClub(ev.getClientName()))
                 {
                     throw("ClientUnknown");//ClientUnknown
                 }
-                //Занят ли стол и попытка пересесть на свой стол генерируется ошибка PlaceIsBusy.
-                computerClub.takeTable(ev.getClientEvent(), );
+                auto client=computerClub.getClientFromList(ev.getClientName());
+                 //Смена стола
+                 if(client->getClientState()==ClientState::Playing)
+                 {
+                    computerClub.changeTable(client, ev.getClientEvent());
+                 }
+                 else
+                 {
+                    //Занят ли стол и попытка пересесть на свой стол генерируется ошибка PlaceIsBusy.
+                    computerClub.takeTable(ev.getClientEvent(), client);
+                 }
+               break;
             }
             case IncomingEvent::ClientWaiting:
             {
@@ -55,8 +64,9 @@ bool EventReader::HandleIncomingEvent(IncomingEvent incEv, Event& ev)
                 //Если очередь больше, чем число столов, то клиент уходит и генерирует OutgoingEvent::ClientLeaves
                 if(computerClub.queueTooBig())
                 {
-                    HandleOutgoingEvent(OutgoingEvent::ClientLeaves, ev);
+                    HandleOutgoingEvent(OutgoingEvent::ClientLeaves, ev, "");
                 }
+                break;
             }
             case IncomingEvent::ClientLeaves:
             {
@@ -69,39 +79,50 @@ bool EventReader::HandleIncomingEvent(IncomingEvent incEv, Event& ev)
                 }
                 //Когда клиент уходит, стол, за которым он сидел освобождается и его занимает первый клиент из очереди ожидания OutgoingEvent::ClientTookTheTable
                 computerClub.clientLeaves(ev.getClientName());
-                HandleOutgoingEvent(OutgoingEvent::ClientTookTheTable, ev);
+                HandleOutgoingEvent(OutgoingEvent::ClientTookTheTable, ev, "");
+                break;
             }
         }
     }
-    catch(...)
+    catch(const char* ErrorText)
     {
-        HandleOutgoingEvent(OutgoingEvent::Error, ev);
+        HandleOutgoingEvent(OutgoingEvent::Error, ev, ErrorText);
     }
 }
 
 
-bool EventReader::HandleOutgoingEvent(OutgoingEvent outEv, Event& ev)
+void EventReader::HandleOutgoingEvent(OutgoingEvent outEv, Event& ev, const char* ErrorText)
 {
     switch(outEv)
     {
         case OutgoingEvent::ClientLeaves://TODO
         {
             //Вывод информации о клиенте
-            auto clientName=computerClub.getNextClient()->getName();
-            unsigned int place=computerClub.getFreeTable();
-            Event e(OutgoingEvent::ClientLeaves, computerClub.getNow(), clientName, place);
+            Event e(OutgoingEvent::ClientLeaves, computerClub.getNow(), ev.getClientName());
+            e.printEvent();
             //Генерируется в конце рабочего дня для всех клиентов, оставшихся в компьютерном клубе, в алфавитном порядке их имен. А также, когда клиент встает в очередь, а очередь ожидания уже заполнена.
+            //computerClub.printProfit();//TODO
+            break;
         }
         case OutgoingEvent::ClientTookTheTable://Клиент из очереди
         {
             //Вывод информации об ивенте
-            //ev.printEvent();// не уверен, что надо
+            if(!computerClub.queIsEmpty())
+            {
+            auto clientName=computerClub.getNextClient()->getName();
+            unsigned int place=computerClub.getFreeTable();
+            Event e(OutgoingEvent::ClientTookTheTable, ev.getTime(), clientName, place);
+            e.printEvent();//Будет отличаться, т.к. не совсем body
             //Генерируется для первого клиента в очереди при освобождении любого стола.
-
+            auto client=computerClub.getClientFromList(clientName);
+            computerClub.takeTable(place, client);
+            }
+            break;
         }
         case OutgoingEvent::Error:
         {
-            //Вывод ошибок, после возникновения
+            std::cout<<ev.getTime()<<" "<<(unsigned int)OutgoingEvent::Error<<" "<<ErrorText<<std::endl;
+            break;
         }
         
     }
@@ -137,33 +158,19 @@ void EventReader::HandleEvent(Event& ev)
             HandleIncomingEvent(IncomingEvent::ClientLeaves, ev);
             break;
         }
-
-        case 11:
-        {
-            HandleOutgoingEvent(OutgoingEvent::ClientLeaves, ev);
-            break;
-        }
-        case 12:
-        {
-            HandleOutgoingEvent(OutgoingEvent::ClientTookTheTable, ev);
-            break;
-        }
-        case 13:
-        {
-             HandleOutgoingEvent(OutgoingEvent::Error, ev);
-            break;
-        }
     }
 }
 void EventReader::ReadFile()
 {
     computerClub.setNumberOfTables(file.ReadTables());
-    computerClub.setTime(file.ReadClubTimeOpen(), file.ReadClubTimeClose());
+    computerClub.setTime(file.ReadClubTimeString());
     computerClub.setCostPerHour(file.ReadCostPerHour());
-    do
+    computerClub.printStartTime();
+    while(!file.endFile())
     {
         Event ev=file.ReadEvent();
         HandleEvent(ev);
-        
-    }while();
+    }    
+    computerClub.printEndTime();
+    //computerClub.printProfit();
 }
