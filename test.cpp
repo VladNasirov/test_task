@@ -1,8 +1,9 @@
 #include "EventReader.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-    EventReader er;
+    std::string path=argv[1];
+    EventReader er(path);
     er.ReadFile();
     return 0;
 }

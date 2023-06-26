@@ -1,5 +1,4 @@
 #include "File.h"
-//TODO дописать логику файлов
 int File::ReadTables()
 {
     std::ifstream inputFile(PATH);
@@ -22,6 +21,7 @@ int File::ReadTables()
             }
         } else {
             std::cout << "Can`t read the line!" << std::endl;
+            exit(-1);
         }
 
     }
@@ -100,8 +100,19 @@ Event File::ReadEvent()
           inputFile.seekg(pos);
         if (std::getline(inputFile, line)) {
         try {
+            if(line.empty())
+            {
+                std::cout<<"Empty line!"<<std::endl;
+                exit(0);
+            }
             ev.StringToEvent(line);
+            if(!(ev.getTime()>=lastEventTime))
+            {
+                std::cout<<"Wrong time on line: "<<line<<" !"<<std::endl;
+                exit(-1);
+            }
             pos = inputFile.tellg();//save pos
+            lastEventTime=ev.getTime();
             return ev;
             } 
             catch (const std::exception&) 
@@ -109,8 +120,11 @@ Event File::ReadEvent()
                 std::cout<<"The "<<line<<" has invalid format!"<<std::endl;
                 exit(-1);
             }
-        } else {
-            std::cout << "Can`t read the line!" << std::endl;
+        }
+        else
+        {
+            std::cout<<"Can`t read the line!"<<std::endl;
+            exit(-1);
         }
 
     }
@@ -127,7 +141,7 @@ Event File::ReadEvent()
     if(inputFile.is_open())
     {
         inputFile.seekg(pos);
-        if(inputFile.eof())
+        if(inputFile.eof()||pos==-1)
         {
             return true;
         }

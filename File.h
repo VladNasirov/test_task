@@ -11,8 +11,13 @@ class File
     int ReadCostPerHour();
     Event ReadEvent();
     bool endFile();
+    void setFilePATH(const std::string path)
+    {
+        PATH=path;
+    }
     private:
-    const std::string PATH = "test_file.txt";
+    std::string PATH = "test_file.txt";
     std::streampos pos;
+    ClubTime lastEventTime;
 };
 

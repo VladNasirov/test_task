@@ -16,10 +16,10 @@ class Club
     bool isOpen(ClubTime ct);
     bool hasFreeTables();
    
-    void clientLeaves(std::string name);
-    void takeTable(int tableNumber, std::shared_ptr<Client> c);
-    void clearTable(std::string clientName);
-    void changeTable(std::shared_ptr<Client> c, unsigned int num);
+    void clientLeaves(std::string name, ClubTime ct);
+    void takeTable(int tableNumber, std::shared_ptr<Client> c, ClubTime ct);
+    void clearTable(std::string clientName, ClubTime ct);
+    void changeTable(std::shared_ptr<Client> c, unsigned int num, ClubTime ct);
     void updateNow(ClubTime eventTime);
     
 

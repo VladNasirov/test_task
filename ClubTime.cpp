@@ -26,20 +26,30 @@ std::ostream& operator<<(std::ostream& os, const ClubTime& time) {
 std::istream& operator>>(std::istream& is, ClubTime& time) {
     char delimiter;
     is >> time.hours >> delimiter >> time.minutes;
+    if(time.hours>23||time.hours<0||time.minutes>59||time.minutes<0)
+    {
+        std::cout<<"Wrong time format!"<<std::endl;
+        exit(-1);
+    }
     return is;
 }
 
- int ClubTime::getHours()
+ unsigned int ClubTime::getHours()
  {
     return hours;
  }
-int ClubTime::getMinutes()
+unsigned int ClubTime::getMinutes()
 {
     return minutes;
 }
 
- ClubTime::ClubTime(int hours, int minutes)
+ ClubTime::ClubTime(unsigned int hours, unsigned int minutes)
  {
    this->hours=hours;
    this->minutes=minutes;
+ }
+  ClubTime::ClubTime()
+ {
+   this->hours=0;
+   this->minutes=0;
  }

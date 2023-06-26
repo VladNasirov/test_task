@@ -1,7 +1,8 @@
 #include "Club.h"
-#include <algorithm>
+
 #include <sstream>
 #include <iomanip>
+#include <algorithm>
 void Club::setNumberOfTables(unsigned int num)
 {
     NumberOfTables=num;
@@ -107,7 +108,7 @@ bool Club::queueTooBig()
     }
 }
 
-void Club::takeTable(int tableNumber, std::shared_ptr<Client> c)//todo пересадку
+void Club::takeTable(int tableNumber, std::shared_ptr<Client> c, ClubTime ct)
 {
     for(int i=0; i<tables.size(); i++)
     {
@@ -115,7 +116,7 @@ void Club::takeTable(int tableNumber, std::shared_ptr<Client> c)//todo пере�
         {
             tables[i].second=c;
             tables[i].second->setClientState(ClientState::Playing);
-            tables[i].first->setTableState(TableState::Occupied);
+            tables[i].first->OccupyTable(ct);
             return;
         }
         else if(tables[i].first->getTableNumber()==tableNumber&&tables[i].first->getTableState()==TableState::Occupied)
@@ -126,13 +127,13 @@ void Club::takeTable(int tableNumber, std::shared_ptr<Client> c)//todo пере�
 
 }
 
-void Club::clientLeaves(std::string name)//TODO удаление из клуба, подсчет выручки
+void Club::clientLeaves(std::string name, ClubTime ct)//TODO удаление из клуба, подсчет выручки
 {
     //Освобождение стола
    for (auto& pair : tables) {
      if (pair.second->getName() == name) {
         pair.second.reset();
-        pair.first->setTableState(TableState::Empty);
+        pair.first->FreeTable(ct);
         break;
      }
    }
@@ -228,35 +229,32 @@ std::shared_ptr<Table> Club::getTableByClient(std::shared_ptr<Client> c)
             }
         }
 }
-bool compareByName(const std::pair<std::shared_ptr<Table>, std::shared_ptr<Client>> pair1, const std::pair<std::shared_ptr<Table>, std::shared_ptr<Client>> pair2) {
-        return pair1.second->getName() < pair2.second->getName();
-}
   
 
-void Club::clearTable(std::string clientName)
+void Club::clearTable(std::string clientName, ClubTime ct)
 {
         for(int i=0; i<tables.size(); i++)
         {
             if(tables[i].second->getName()==clientName)
             {
-                tables[i].first->setTableState(TableState::Empty);
+                tables[i].first->FreeTable(ct);
                 tables[i].second->setClientState(ClientState::None);
                 tables[i].second.reset();
             }
         }
 }
-void Club::changeTable(std::shared_ptr<Client> c, unsigned int num)//proverit
+void Club::changeTable(std::shared_ptr<Client> c, unsigned int num, ClubTime ct)
 {
         std::shared_ptr<Table> currentTab=getTableByClient(c);
         if(currentTab->getTableNumber()!=num)
         {
 
-            takeTable(num, c);
+            takeTable(num, c, ct);
             for(auto& pair: tables)
             {
                 if(pair.first==currentTab)
                 {
-                   pair.first->FreeTable();
+                   pair.first->FreeTable(ct);
                    pair.second.reset();
                 }
             }
@@ -278,11 +276,22 @@ bool Club::queIsEmpty()
     return false;
     }
 }
-
+bool compareByName(const std::pair<std::shared_ptr<Table>, std::shared_ptr<Client>> pair1, const std::pair<std::shared_ptr<Table>, std::shared_ptr<Client>> pair2) {
+        return pair1.second->getName() < pair2.second->getName();
+}
 void Club::printProfit()
 {
-    
+    //std::sort(tables.begin(), tables.end(), compareByName);
+    for(auto pair: tables)
+    {
+        if(pair.second!=nullptr)
+        {
+            pair.first->FreeTable(stop);
+        }
+        std::cout<<pair.first->getTableNumber()<<" "<<pair.first->getTotalUsageTime().serialize()<<" "<<(pair.first->getTableHours())*CostPerHour<<std::endl;
+    }
 }
+
 void Club::printEndTime()
 {
     std::cout<<stop<<std::endl;

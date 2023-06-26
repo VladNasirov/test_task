@@ -9,25 +9,43 @@ class ClubTime
     friend std::ostream& operator<<(std::ostream& os, const ClubTime& time);
     void deserialize(const std::string& serializedTime);
     friend std::istream& operator>>(std::istream& is, ClubTime& time);
-    int getHours();
-    int getMinutes();
-    ClubTime(int hours, int minutes);
-    ClubTime()=default;
+    unsigned int getHours();
+    unsigned int getMinutes();
+    ClubTime(unsigned int hours, unsigned int minutes);
+    ClubTime();
     ClubTime operator+(const ClubTime& other) const {
-        int totalMinutes = minutes + other.minutes;
-        int carry = totalMinutes / 60;
-        int finalMinutes = totalMinutes % 60;
-        int finalHours = hours + other.hours + carry;
+        unsigned int totalMinutes = minutes + other.minutes;
+        unsigned int carry = totalMinutes / 60;
+        unsigned int finalMinutes = totalMinutes % 60;
+        unsigned int finalHours = hours + other.hours + carry;
         return ClubTime(finalHours, finalMinutes);
     }
 
     ClubTime operator-(const ClubTime& other) const {
-        int totalMinutes = hours * 60 + minutes - (other.hours * 60 + other.minutes);
-        int finalHours = totalMinutes / 60;
-        int finalMinutes = totalMinutes % 60;
+        unsigned int totalMinutes = hours * 60 + minutes - (other.hours * 60 + other.minutes);
+        unsigned int finalHours = totalMinutes / 60;
+        unsigned int finalMinutes = totalMinutes % 60;
         return ClubTime(finalHours, finalMinutes);
     }
+    bool operator>=(const ClubTime& other) const {
+    if (hours > other.hours) {
+        return true;
+    } else if (hours == other.hours && minutes >= other.minutes) {
+        return true;
+    } else
+    {
+        return false;
+    }
+    }
+
+    ClubTime& operator+=(const ClubTime& other) {
+    minutes += other.minutes;
+    hours += other.hours + minutes / 60;
+    minutes %= 60;
+    return *this;
+    }
+
     private:
-    int hours;
-    int minutes;
+    unsigned int hours;
+    unsigned int minutes;
 };

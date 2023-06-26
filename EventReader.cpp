@@ -42,12 +42,12 @@ void EventReader::HandleIncomingEvent(IncomingEvent incEv, Event& ev)
                  //Смена стола
                  if(client->getClientState()==ClientState::Playing)
                  {
-                    computerClub.changeTable(client, ev.getClientEvent());
+                    computerClub.changeTable(client, ev.getClientEvent(), ev.getTime());
                  }
                  else
                  {
                     //Занят ли стол и попытка пересесть на свой стол генерируется ошибка PlaceIsBusy.
-                    computerClub.takeTable(ev.getClientEvent(), client);
+                    computerClub.takeTable(ev.getClientEvent(), client, ev.getTime());
                  }
                break;
             }
@@ -78,7 +78,7 @@ void EventReader::HandleIncomingEvent(IncomingEvent incEv, Event& ev)
                     throw("ClientUnknown");//ClientUnknown
                 }
                 //Когда клиент уходит, стол, за которым он сидел освобождается и его занимает первый клиент из очереди ожидания OutgoingEvent::ClientTookTheTable
-                computerClub.clientLeaves(ev.getClientName());
+                computerClub.clientLeaves(ev.getClientName(), ev.getTime());
                 HandleOutgoingEvent(OutgoingEvent::ClientTookTheTable, ev, "");
                 break;
             }
@@ -115,7 +115,7 @@ void EventReader::HandleOutgoingEvent(OutgoingEvent outEv, Event& ev, const char
             e.printEvent();//Будет отличаться, т.к. не совсем body
             //Генерируется для первого клиента в очереди при освобождении любого стола.
             auto client=computerClub.getClientFromList(clientName);
-            computerClub.takeTable(place, client);
+            computerClub.takeTable(place, client, e.getTime());
             }
             break;
         }
@@ -172,5 +172,6 @@ void EventReader::ReadFile()
         HandleEvent(ev);
     }    
     computerClub.printEndTime();
-    //computerClub.printProfit();
+    
+    computerClub.printProfit();
 }

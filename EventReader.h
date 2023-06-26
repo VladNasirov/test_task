@@ -10,6 +10,10 @@ class EventReader
     void HandleEvent(Event& ev);
     void HandleIncomingEvent(IncomingEvent incEv, Event& ev);
     void HandleOutgoingEvent(OutgoingEvent outEv, Event& ev, const char* ErrorText);
+    EventReader(std::string path)
+    {
+        file.setFilePATH(path);
+    }
     private:
     Club computerClub;
     File file;

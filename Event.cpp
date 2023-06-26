@@ -31,7 +31,14 @@ unsigned int Event::getEventId()
 
 void Event::printEvent()
 {
-    std::cout<<eventTime<<" "<<eventId<<" "<<clientName<<std::endl;
+    if(eventId==2||eventId==12)
+    {
+        std::cout<<eventTime<<" "<<eventId<<" "<<clientName<<" "<<clientEvent<<std::endl;
+    }
+    else
+    {
+        std::cout<<eventTime<<" "<<eventId<<" "<<clientName<<std::endl;
+    }
 }
 
 ClubTime Event::getTime()
